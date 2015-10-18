@@ -26,35 +26,33 @@ func (r *ReplaceReader) Read(p []byte) (int, error) {
 	// testing travis
 
 	for i, b := range buf {
-		// nothing to do
-		// fmt.Println(offsetFound)
 		if b != byte(r.search[offsetFound]) {
-			res = append(res, b)
-			counter++
-
 			// reset
-			if offsetFound > 0 {
-				// if the offset found was not the last and it didnt match, reseting the changes
+			if offsetFound > 0 && offsetFound < len(r.search) {
+				// if the offset found was not the last and it didnt match, resetting the changes
 				if offsetFound < len(r.search)-1 {
-					for t := 1; t < offsetFound-1; t++ {
-						fmt.Println(string(res[i-t]), string(r.search[offsetFound-t]))
-						res[i-t] = r.search[offsetFound-t]
+					for t := offsetFound; t > 0; t-- {
+						res[len(res)-t] = r.search[offsetFound-t]
 					}
 				}
 				offsetFound = 0
 			}
+			fmt.Println(string(b))
+			res = append(res, b)
+			counter++
+
 			continue
 		}
 
-		// fmt.Printf("found %v", string(b))
 		// are we at the end ?
 		if i == n-1 {
 			// yes we need to load to read the len(search)-offsetFound char
 			missingBytes := make([]byte, len(r.search)-offsetFound)
 			var k int
 			k, err = r.underlying.Read(missingBytes)
-			if err != nil {
+			if err != nil && io.EOF != nil {
 				// can't read the next bytes
+				return counter, err
 			}
 			if k < len(r.search)-1 {
 				// no need to read anymore, copy what we received to keep it
@@ -69,20 +67,16 @@ func (r *ReplaceReader) Read(p []byte) (int, error) {
 			buf = append(buf, missingBytes[:k]...)
 		}
 
-		var replacementOffset int
 		// if replacement is shorter than search
 		if offsetFound >= len(r.replacement)-1 {
-			replacementOffset = len(r.replacement) - 1
-		} else {
-			replacementOffset = offsetFound
+			continue
 		}
 
-		// replacing the char
-		res = append(res, r.replacement[replacementOffset])
+		res = append(res, r.replacement[offsetFound])
 		counter++
 		offsetFound++
 
-		// all replacement was done
+		// all replacement were done
 		if offsetFound == len(r.search)-1 {
 			// replacement is more long than the search
 			if offsetFound < len(r.replacement)-1 {
