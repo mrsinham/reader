@@ -23,6 +23,8 @@ func (r *ReplaceReader) Read(p []byte) (int, error) {
 	var counter int
 	var offsetFound int
 
+	// testing travis
+
 	for i, b := range buf {
 		// nothing to do
 		// fmt.Println(offsetFound)
