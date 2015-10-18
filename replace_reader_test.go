@@ -27,7 +27,7 @@ func TestReplaceReader(t *testing.T) {
 	et faites le maintenant`
 
 	if string(res) != expected {
-		t.Fatalf("%v was expected, received %v", expected, string(res))
+		t.Fatalf("\nexpected : \n%v \n received : \n%v", expected, string(res))
 	}
 
 }
@@ -53,7 +53,7 @@ func TestReplaceReaderMoreComplicated(t *testing.T) {
 	et faites le maintenant`
 
 	if string(res) != expected {
-		t.Fatalf("%v was expected, received %v", expected, string(res))
+		t.Fatalf("\nexpected : \n%v \n received : \n%v", expected, string(res))
 	}
 
 }
@@ -74,12 +74,12 @@ func TestReplaceReaderMoreMoreComplicated(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `j'aimerai vous dite que je n'aime pas le fait de coller
+	expected := `j'aimerai vous dire que je n'aime pas le fait de coller
 	des caractères -- ensemble. Changez ca tout de suite, je n'en veux plus de tous ces --
 	et faites le maintenant`
 
 	if string(res) != expected {
-		t.Fatalf("expected : %v \n received : %v", expected, string(res))
+		t.Fatalf("\nexpected : \n%v \n received : \n%v", expected, string(res))
 	}
 
 }

@@ -19,27 +19,74 @@ func (r *ReplaceReader) Read(p []byte) (int, error) {
 	// reducing to the good size
 	buf = buf[:n]
 
-	var res []byte
+	var res []byte = make([]byte, 0)
 	var counter int
 	var offsetFound int
 
 	// testing travis
 
+	// fmt.Println(string(r.search[6]))
+
+	// os.Exit(-1)
+
 	for i, b := range buf {
-		if b != byte(r.search[offsetFound]) {
+
+		// if offsetFound == len(r.search) {
+		// 	if offsetFound < len(r.replacement)-1 {
+		// 		// adding missing char
+		// 		for _, o := range r.replacement[offsetFound:] {
+		// 			res = append(res, o)
+		// 			counter++
+		// 		}
+		// 	}
+		// 	offsetFound = 0
+		// 	// continue
+		// }
+
+		// if b != r.search[offsetFound] {
+		// 	res = append(res, b)
+		// 	counter++
+		// 	continue
+		// }
+
+		// res = append(res, r.replacement[offsetFound])
+		// offsetFound++
+		// counter++
+
+		// fmt.Println(string(b), string(r.search[offsetFound]), offsetFound)
+		// fmt.Println(offsetFound)
+		// all replacement were done
+		if offsetFound == len(r.search)-1 {
+			// replacement is more long than the search
+			if offsetFound < len(r.replacement)-1 {
+				// adding missing char
+				for _, o := range r.replacement[offsetFound:] {
+					res = append(res, o)
+					counter++
+				}
+			}
+			offsetFound = 0
+
+		}
+
+		if b != r.search[offsetFound] {
+			// fmt.Println(string(b))
+			res = append(res, b)
+			counter++
+
 			// reset
-			if offsetFound > 0 && offsetFound < len(r.search) {
-				// if the offset found was not the last and it didnt match, resetting the changes
-				if offsetFound < len(r.search)-1 {
-					for t := offsetFound; t > 0; t-- {
-						res[len(res)-t] = r.search[offsetFound-t]
+			if offsetFound > 0 {
+				if offsetFound == len(r.search)-1 {
+					// if the offset found was not the last and it didnt match, resetting the changes
+					fmt.Println("toto")
+					for t := offsetFound; t >= 0; t-- {
+						res[len(res)-1-t] = r.search[offsetFound-t]
 					}
 				}
 				offsetFound = 0
 			}
-			fmt.Println(string(b))
-			res = append(res, b)
-			counter++
+
+			// fmt.Println(b, r.search[offsetFound])
 
 			continue
 		}
@@ -68,27 +115,15 @@ func (r *ReplaceReader) Read(p []byte) (int, error) {
 		}
 
 		// if replacement is shorter than search
-		if offsetFound >= len(r.replacement)-1 {
+		if offsetFound == len(r.replacement)-1 {
 			continue
 		}
 
+		// fmt.Println(string(r.replacement[offsetFound]))
 		res = append(res, r.replacement[offsetFound])
 		counter++
+
 		offsetFound++
-
-		// all replacement were done
-		if offsetFound == len(r.search)-1 {
-			// replacement is more long than the search
-			if offsetFound < len(r.replacement)-1 {
-				// adding missing char
-				for _, o := range r.replacement[offsetFound:] {
-					res = append(res, o)
-					counter++
-				}
-			}
-
-			offsetFound = 0
-		}
 
 	}
 
